@@ -74,7 +74,7 @@ function waitForIdle(counters, timeLimitMs, timeout, interval) {
       cy.log("Seems network is busy. Let's wait a bit more")
     }
 
-    cy.wait(interval, { log: false }).then(check)
+    cy.wait(interval, { log: true }).then(check)
   }
 }
 
