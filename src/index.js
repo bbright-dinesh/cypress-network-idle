@@ -36,7 +36,8 @@ function waitForIdle(counters, timeLimitMs, timeout, interval) {
     const waited = d - counters.started
     const elapsed = d - t
 
-    if (elapsed > timeLimitMs && !counters.currentCallCount) {
+    // if (elapsed > timeLimitMs && !counters.currentCallCount) {
+      if (!counters.currentCallCount) {
       if (log) {
         cy.log(`${logPrefix} finished after ${waited} ms`)
       }
