@@ -17,24 +17,21 @@ Cypress.on('test:after:run', () => {
 function waitForIdle(counters, timeLimitMs, timeout, interval) {
   counters.started = +new Date()
   counters.finished = null
-
   const log = 'log' in counters ? counters.log : true
+  if (timeLimitMs === undefined || timeLimitMs === 0) {
+    // set default timeout to 2000ms
+    timeLimitMs = 2000
+  }
   if (log) {
     cy.log(`${logPrefix} for ${timeLimitMs} ms (timeout: ${timeout} ms)`)
   }
+
   cy.wrap(`${logPrefix} waiting...`, { timeout, log }).then(check)
 
   function resetCounters() {
     counters.callCount = 0
     counters.currentCallCount = 0
     counters.lastNetworkAt = null
-  }
-
-  if (interval == 0) {
-    cy.log(`Interval set to 0, replacing this with 2000 ms`)
-    interval = 2000
-  } else {
-    cy.log(`Idle network interval set to ${interval} ms`)
   }
 
   function check() {
@@ -58,6 +55,10 @@ function waitForIdle(counters, timeLimitMs, timeout, interval) {
       )
       resetCounters()
       return
+    } else if (counters.currentCallCount) {
+      // Increase the timeLimitMs by 3x the currentCallCount
+      // to allow for the network to finish
+      timeLimitMs += counters.currentCallCount * 3
     }
 
     if (waited > timeout) {
