@@ -92,6 +92,7 @@ function waitForNetworkIdleImpl({
   }
   const counters = {
     callCount: 0,
+    currentCallCount: 0,
     lastNetworkAt: null,
     log,
   }
@@ -111,6 +112,7 @@ function waitForNetworkIdleImpl({
       //cy.log(`Received response ${res.statusCode}`)
       // console.log('res %s %s', req.method, req.url, counters.lastNetworkAt)
       // console.log(res.body)
+      console.log(counters.currentCallCount)
     })
   })
 
@@ -197,99 +199,4 @@ function waitForNetworkIdle(...args) {
   })
 }
 
-function waitForNetworkIdlePrepare({
-  method,
-  pattern,
-  alias,
-  log,
-  failOn5xx,
-  failOn4xx,
-  failOn,
-} = {}) {
-  if (!alias) {
-    throw new Error('cypress-network-idle: alias is required')
-  }
-  if (!pattern) {
-    throw new Error('cypress-network-idle: URL pattern is required')
-  }
-
-  if (failOn) {
-    if (typeof failOn !== 'function') {
-      throw new Error('cypress-network-idle: expected failOn to be a function')
-    }
-  }
-  if (typeof log === 'undefined') {
-    // by default, we want to log the network activity
-    log = true
-  }
-
-  let message = `prepared for **@${alias}**`
-  if (failOn5xx && failOn4xx) {
-    message += ' (will fail on **4xx, 5xx**)'
-  } else if (failOn4xx) {
-    message += ' (will fail on **4xx**)'
-  } else if (failOn5xx) {
-    message += ' (will fail on **5xx**)'
-  }
-  Cypress.log({ name: 'network-idle', message })
-
-  const key = `networkIdleCounters_${alias}`
-  // check if the intercept has already been set
-  if (Cypress.env(key)) {
-    const registered = Cypress.env(key)
-    if (registered.method === method && registered.pattern === pattern) {
-      // the same intercept has already been registered
-      // so we should not register the same intercept again
-      return
-    }
-  }
-
-  const counters = {
-    // all network calls started after we start waiting
-    callCount: 0,
-    // current number of pending calls
-    currentCallCount: 0,
-    lastNetworkAt: null,
-    log,
-    method,
-    pattern,
-  }
-  Cypress.env(key, counters)
-
-  cy.intercept('*', (req) => {
-    counters.callCount += 1
-    counters.currentCallCount += 1
-    counters.lastNetworkAt = +new Date()
-    // console.log('called', method, pattern)
-
-    // seems using event callbacks allows the other stubs to be called
-    // https://github.com/bahmutov/cypress-network-idle/issues/8
-    req.on('response', (res) => {
-      counters.currentCallCount -= 1
-      counters.lastNetworkAt = +new Date()
-      // console.log('res %s %s', req.method, req.url, counters.lastNetworkAt)
-      // console.log(res.body)
-      if (failOn) {
-        // let the user decide if we need to fail the test
-        const message = failOn(req, res)
-        if (message) {
-          throw new Error(message)
-        }
-      }
-
-      if (failOn4xx && res.statusCode >= 400 && res.statusCode < 500) {
-        throw new Error(
-          `Network call ${req.method} ${req.url} failed with ${res.statusCode}`,
-        )
-      }
-      if (failOn5xx && res.statusCode >= 500) {
-        throw new Error(
-          `Network call ${req.method} ${req.url} failed with ${res.statusCode}`,
-        )
-      }
-    })
-  }).as(alias)
-}
-
 Cypress.Commands.add('waitForNetworkIdle', waitForNetworkIdle)
-Cypress.Commands.add('waitForNetworkIdlePrepare', waitForNetworkIdlePrepare)
