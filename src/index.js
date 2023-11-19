@@ -108,7 +108,7 @@ function waitForNetworkIdleImpl({
     req.on('response', (res) => {
       counters.lastNetworkAt = +new Date()
       counters.currentCallCount -= 1
-      cy.log(`Received response ${res.statusCode}`)
+      //cy.log(`Received response ${res.statusCode}`)
       // console.log('res %s %s', req.method, req.url, counters.lastNetworkAt)
       // console.log(res.body)
     })
