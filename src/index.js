@@ -97,6 +97,7 @@ function waitForNetworkIdleImpl({
 
   cy.intercept('*', (req) => {
     counters.callCount += 1
+    counters.currentCallCount += 1
     counters.lastNetworkAt = +new Date()
     // console.log('req %s %s', req.method, req.url, counters.lastNetworkAt)
 
@@ -104,6 +105,7 @@ function waitForNetworkIdleImpl({
     // https://github.com/bahmutov/cypress-network-idle/issues/8
     req.on('response', (res) => {
       counters.lastNetworkAt = +new Date()
+      counters.callCount += 1
       counters.currentCallCount -= 1
       //cy.log(`Received response ${res.statusCode}`)
       // console.log('res %s %s', req.method, req.url, counters.lastNetworkAt)
