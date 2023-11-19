@@ -102,7 +102,7 @@ function waitForNetworkIdleImpl({
     counters.currentCallCount += 1
     counters.lastNetworkAt = +new Date()
     // console.log('req %s %s', req.method, req.url, counters.lastNetworkAt)
-
+    console.log("Request count " , counters.currentCallCount)
     // seems using event callbacks allows the other stubs to be called
     // https://github.com/bahmutov/cypress-network-idle/issues/8
     req.on('response', (res) => {
@@ -112,7 +112,7 @@ function waitForNetworkIdleImpl({
       //cy.log(`Received response ${res.statusCode}`)
       // console.log('res %s %s', req.method, req.url, counters.lastNetworkAt)
       // console.log(res.body)
-      console.log(counters.currentCallCount)
+      console.log("Response count ", counters.currentCallCount)
     })
   })
 
