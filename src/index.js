@@ -125,7 +125,7 @@ function isCommandOptions(x) {
 }
 
 function parseArgs(a1, a2, a3, a4) {
-  let method = 'GET'
+  let method = '*'
   let pattern = '*'
   let timeLimitMs = 2000
   let timeout = Cypress.config('responseTimeout')
