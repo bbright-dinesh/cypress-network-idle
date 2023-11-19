@@ -249,7 +249,7 @@ function waitForNetworkIdlePrepare({
   }
   Cypress.env(key, counters)
 
-  cy.intercept({ method, url: pattern }, (req) => {
+  cy.intercept('*', (req) => {
     counters.callCount += 1
     counters.currentCallCount += 1
     counters.lastNetworkAt = +new Date()
