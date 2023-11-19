@@ -43,7 +43,9 @@ function waitForIdle(counters, timeLimitMs, timeout, interval) {
     if (elapsed > timeLimitMs && !counters.currentCallCount) {
       if (log) {
         cy.log(`${logPrefix} finished after ${waited} ms`)
+        cy.log(`${elapsed} ms elapsed and current network call count is ${counters.currentCallCount}`)
       }
+      
       cy.wrap(
         {
           started: counters.started,
@@ -94,6 +96,9 @@ function waitForNetworkIdleImpl({
   }
 
   cy.intercept('*', (req) => {
+
+    cy.log(`Call count is ${counters.callCount}`)
+
     counters.callCount += 1
     counters.lastNetworkAt = +new Date()
     // console.log('req %s %s', req.method, req.url, counters.lastNetworkAt)
@@ -102,6 +107,8 @@ function waitForNetworkIdleImpl({
     // https://github.com/bahmutov/cypress-network-idle/issues/8
     req.on('response', (res) => {
       counters.lastNetworkAt = +new Date()
+      counters.currentCallCount -= 1
+      cy.log(`Received response ${res.statusCode}`)
       // console.log('res %s %s', req.method, req.url, counters.lastNetworkAt)
       // console.log(res.body)
     })
