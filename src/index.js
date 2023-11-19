@@ -97,7 +97,7 @@ function waitForNetworkIdleImpl({
     log,
   }
 
-  cy.intercept('POST', (req) => {
+  cy.intercept('*', (req) => {
     counters.callCount += 1
     counters.currentCallCount += 1
     counters.lastNetworkAt = +new Date()
