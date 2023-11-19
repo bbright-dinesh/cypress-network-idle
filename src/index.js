@@ -43,38 +43,22 @@ function waitForIdle(counters, timeLimitMs, timeout, interval) {
     const waited = d - counters.started
     const elapsed = d - t
 
-    // Wait indefinitely if there are pending network calls
-    if (counters.currentCallCount) {
+    if (elapsed > timeLimitMs && !counters.currentCallCount) {
       if (log) {
-        cy.log(
-          `${logPrefix} waiting for ${counters.currentCallCount} pending network calls`,
-        )
+        cy.log(`${logPrefix} finished after ${waited} ms`)
       }
-      cy.wait(interval, { log: false }).then(check)
+      cy.wrap(
+        {
+          started: counters.started,
+          finished: d,
+          waited,
+          callCount: counters.callCount,
+        },
+        { log: false },
+      )
+      resetCounters()
       return
-    } else {
-      if (log) {
-        cy.log(`${logPrefix} no pending network calls`)
-        resetCounters()
-        return
-      }
     }
-    // if (elapsed > timeLimitMs && !counters.currentCallCount) {
-    //   if (log) {
-    //     cy.log(`${logPrefix} finished after ${waited} ms`)
-    //   }
-    //   cy.wrap(
-    //     {
-    //       started: counters.started,
-    //       finished: d,
-    //       waited,
-    //       callCount: counters.callCount,
-    //     },
-    //     { log: false },
-    //   )
-    //   resetCounters()
-    //   return
-    // }
 
     if (waited > timeout) {
       // resetCounters()
