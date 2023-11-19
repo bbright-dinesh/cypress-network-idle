@@ -30,6 +30,13 @@ function waitForIdle(counters, timeLimitMs, timeout, interval) {
     counters.lastNetworkAt = null
   }
 
+  if (interval == 0) {
+    cy.log(`Interval set to 0, replacing this with 2000 ms`)
+    interval = 2000
+  } else {
+    cy.log(`Idle network interval set to ${interval} ms`)
+  }
+
   function check() {
     const d = +new Date()
     const t = counters.lastNetworkAt || counters.started
