@@ -23,7 +23,7 @@ function waitForIdle(counters, timeLimitMs, timeout, interval) {
     timeLimitMs = 2000
   }
   if (log) {
-    cy.log(`${logPrefix} for ${timeLimitMs} ms (timeout: ${timeout} ms)`)
+    cy.log(`${logPrefix} for ${timeLimitMs} ms`)
   }
 
   cy.wrap(`${logPrefix} waiting...`, { timeout, log }).then(check)
@@ -58,6 +58,11 @@ function waitForIdle(counters, timeLimitMs, timeout, interval) {
     } else if (counters.currentCallCount) {
       // Increase the timeLimitMs by 3x the currentCallCount
       // to allow for the network to finish
+      if (log) {
+        cy.log(
+          `${logPrefix} waiting for ${counters.currentCallCount} network calls to finish`,
+        )
+      }
       timeLimitMs += counters.currentCallCount * 3
     }
 
