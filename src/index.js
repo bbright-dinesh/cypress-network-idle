@@ -74,7 +74,7 @@ function waitForIdle(counters, timeLimitMs, timeout, interval) {
       cy.log("Seems network is busy. Let's wait a bit more")
     }
 
-    cy.wait(interval, { log: true }).then(check)
+    cy.wait(interval, { log: false }).then(check)
   }
 }
 
@@ -96,9 +96,6 @@ function waitForNetworkIdleImpl({
   }
 
   cy.intercept('*', (req) => {
-
-    cy.log(`Call count is ${counters.callCount}`)
-
     counters.callCount += 1
     counters.lastNetworkAt = +new Date()
     // console.log('req %s %s', req.method, req.url, counters.lastNetworkAt)
